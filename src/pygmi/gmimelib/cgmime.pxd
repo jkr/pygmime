@@ -2,8 +2,7 @@ from libc.stdio cimport fopen, FILE, stdin, stdout
 
 cdef extern from "gmime/gmime.h":
 
-    ctypedef struct time_t:
-        pass
+    ctypedef long time_t
 
     ctypedef struct guint32: 
         pass
