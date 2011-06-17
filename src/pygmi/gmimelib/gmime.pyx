@@ -9,6 +9,14 @@ def init(flags=None):
 ## UTILS
 ##############################################################################
 
+def decode_header_date(char *date):
+    # Note that while the tz_offset optionally goes into a pointer in
+    # gmime, I'm just returning a double here, and applications can
+    # decide what they want to do with the offset.
+    cdef int tz_offset
+    timestamp = g_mime_utils_header_decode_date(date, &tz_offset)
+    return (timestamp, tz_offset)
+
 def generate_message_id (char *fqdn):
     return g_mime_utils_generate_message_id(fqdn)
 
