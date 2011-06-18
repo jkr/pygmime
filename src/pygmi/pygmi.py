@@ -107,8 +107,8 @@ class Headers(object):
     def get(self, name):
         try:
             return self._headers.get(name)
-        except:
-            raise HeaderNameError, name
+        except KeyError:
+            return None
 
     def __iter__(self):
         return self
