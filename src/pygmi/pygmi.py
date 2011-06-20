@@ -71,6 +71,8 @@ class AddressList(object):
 class References(object):
     
     def __init__(self, references_str):
+        if references_str is None:
+            references_str = ""
         self.refs = gmimelib.decode_references(references_str)
         self._full_refs = gmimelib.decode_references(references_str)
         
