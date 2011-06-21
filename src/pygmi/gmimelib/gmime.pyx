@@ -98,6 +98,14 @@ cdef class Stream (object):
     def tell(self):
         return g_mime_stream_tell(self._c_gmstream)
 
+    def flush(self):
+        g_mime_stream_flush(self._c_gmstream)
+
+    def close(self):
+        out = g_mime_stream_close(self._c_gmstream)
+        if not out == 0:
+            raise Exception, "Couldn't close the stream."
+
 ##############################################################################
 ## PARSER
 ##############################################################################

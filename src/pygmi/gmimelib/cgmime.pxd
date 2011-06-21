@@ -1,4 +1,4 @@
-from libc.stdio cimport fopen, FILE, stdin, stdout
+from libc.stdio cimport fopen, fclose, FILE, stdin, stdout
 
 cdef extern from "gmime/gmime.h":
 
@@ -248,6 +248,7 @@ cdef extern from "gmime/gmime.h":
     GMimeStream*        g_mime_stream_buffer_new            (GMimeStream *source, GMimeStreamBufferMode mode)
     ssize_t     g_mime_stream_length (GMimeStream *stream)
     void        g_mime_stream_flush (GMimeStream *stream)
+    int         g_mime_stream_close (GMimeStream *stream)
 
     GMimeStream*        g_mime_stream_filter_new            (GMimeStream *stream)
     int                 g_mime_stream_filter_add            (GMimeStreamFilter *stream, GMimeFilter *filter)
