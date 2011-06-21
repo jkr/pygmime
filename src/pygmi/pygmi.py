@@ -153,6 +153,9 @@ class Parser(object):
     def _reset(self):
         self.stream.reset()
 
+    def close(self):
+        self.stream.close()
+
 
 class MimeObject(object):
 
