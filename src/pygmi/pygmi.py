@@ -77,6 +77,9 @@ class AddressList(object):
                 yield add_lst[i]
         return address_generator(self)
 
+    def __bool__(self):
+        return len(self)
+
     def __str__(self):
         return self._gm_address_list.to_string()
 
