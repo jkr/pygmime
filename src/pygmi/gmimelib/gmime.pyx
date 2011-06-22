@@ -816,6 +816,9 @@ cdef InternetAddressGroup mk_internet_address_group(CInternetAddressGroup *iag):
 cdef class InternetAddressList(object):
 
     cdef CInternetAddressList *_c_internet_address_list
+
+    def __init__(self):
+        self._c_internet_address_list = internet_address_list_new()
     
     def length(self):
         return internet_address_list_length(self._c_internet_address_list)
@@ -835,8 +838,11 @@ cdef class InternetAddressList(object):
         return mk_internet_address(cia)
 
     def to_string(self, bint encode=True):
-        return internet_address_list_to_string(
-            self._c_internet_address_list, encode)
+        out_str = internet_address_list_to_string(self._c_internet_address_list, encode)
+        if out_str == NULL:
+            return ""
+        else:
+            return out_str
 
     def append(self, InternetAddressList other):
         internet_address_list_append(self._c_internet_address_list,
@@ -852,10 +858,26 @@ cdef class InternetAddressList(object):
                                       idx,
                                       addr._c_internet_address)
 
+    def remove(self, InternetAddress addr):
+        out_bool = internet_address_list_remove (self._c_internet_address_list,
+                                                 addr._c_internet_address)
+        if not out_bool:
+            raise Exception, "Couldn't remove item %s" % addr
+
+    def remove_at(self, InternetAddress addr, int idx):
+        out_bool = internet_address_list_remove_at (self._c_internet_address_list,
+                                                    idx)
+        if not out_bool:
+            raise Exception, "Couldn't remove item at index %d" % idx
+
+
+
+
 cdef InternetAddressList mk_internet_address_list(CInternetAddressList *cial):
     cdef InternetAddressList ial = InternetAddressList()
     ial._c_internet_address_list = cial
     return ial
+
 
 # Static construction function
 def parse_internet_address_list(char *s):

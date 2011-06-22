@@ -61,6 +61,9 @@ class AddressList(object):
 
     __slots__ = ["_gm_address_list"]
 
+    def __init__(self):
+        self._gm_address_list = gmimelib.InternetAddressList()
+
     def __getitem__(self, idx):
         if idx < len(self):
             gmaddress = self._gm_address_list.get_address(idx)
