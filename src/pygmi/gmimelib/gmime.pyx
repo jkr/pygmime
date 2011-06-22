@@ -748,8 +748,18 @@ cdef class InternetAddress(object):
     def to_internet_address_mailbox(self):
         if not self.is_internet_address_mailbox():
             raise Exception, "Can't convert to message"
-        cdef CInternetAddressMailbox *iab = INTERNET_ADDRESS_MAILBOX(self._c_internet_address)
-        return mk_internet_address_mailbox(iab)
+        cdef CInternetAddressMailbox *iam = INTERNET_ADDRESS_MAILBOX(self._c_internet_address)
+        return mk_internet_address_mailbox(iam)
+
+    def is_internet_address_group(self):
+        return INTERNET_ADDRESS_IS_GROUP(self._c_internet_address)
+
+    def to_internet_address_group(self):
+        if not self.is_internet_address_group():
+            raise Exception, "Can't convert to message"
+        cdef CInternetAddressGroup *iag = INTERNET_ADDRESS_GROUP(self._c_internet_address)
+        return mk_internet_address_group(iag)
+
         
 
 ##############################################################################
@@ -772,6 +782,29 @@ cdef InternetAddressMailbox mk_internet_address_mailbox(CInternetAddressMailbox 
     mailbox._c_internet_address = INTERNET_ADDRESS(iam)
     return mailbox
 
+##############################################################################
+## INTERNET ADDRESS GROUP 
+##############################################################################
+
+cdef class InternetAddressGroup(InternetAddress):
+
+    cdef CInternetAddressGroup *_c_internet_address_group
+
+    def __cinit__(self):
+        InternetAddress.__init__(self)
+
+    def get_members(self):
+        cdef CInternetAddressList *cial 
+        cial = internet_address_group_get_members(self._c_internet_address_group)
+        return mk_internet_address_list(cial)
+
+cdef InternetAddressGroup mk_internet_address_group(CInternetAddressGroup *iag):
+    group = InternetAddressGroup()
+    group._c_internet_address_group = iag
+    group._c_internet_address = INTERNET_ADDRESS(iag)
+    return group
+
+
 
 ##############################################################################
 ## INTERNET ADDRESS LIST
@@ -781,9 +814,6 @@ cdef class InternetAddressList(object):
 
     cdef CInternetAddressList *_c_internet_address_list
     
-    cdef _from_c_internet_address_list(self, CInternetAddressList *cial):
-        self._c_internet_address_list = cial
-
     def length(self):
         return internet_address_list_length(self._c_internet_address_list)
 
@@ -808,14 +838,17 @@ cdef class InternetAddressList(object):
             self._c_internet_address_list, encode)
 
 
+cdef InternetAddressList mk_internet_address_list(CInternetAddressList *cial):
+    cdef InternetAddressList ial = InternetAddressList()
+    ial._c_internet_address_list = cial
+    return ial
+
 # Static construction function
 def parse_internet_address_list(char *s):
     """A static function that takes a string and returns an
     InternetAddressList() object."""
-    cdef InternetAddressList ial = InternetAddressList()
     cdef CInternetAddressList *cial = internet_address_list_parse_string (s)
-    ial._from_c_internet_address_list (cial)
-    return ial
+    return mk_internet_address_list(cial)
 
         
 
