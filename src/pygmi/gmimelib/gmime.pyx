@@ -729,9 +729,6 @@ def string_to_content_disposition(char *string):
 cdef class InternetAddress(object):
     cdef CInternetAddress *_c_internet_address
     
-    cdef _from_c_internet_address(self, CInternetAddress *cia):
-        self._c_internet_address = cia
-
     def get_name(self):
         out = internet_address_get_name(self._c_internet_address)
         if out is NULL:
@@ -760,7 +757,13 @@ cdef class InternetAddress(object):
         cdef CInternetAddressGroup *iag = INTERNET_ADDRESS_GROUP(self._c_internet_address)
         return mk_internet_address_group(iag)
 
-        
+    def to_internet_address(self):
+        return mk_internet_address(self._c_internet_address)
+
+cdef InternetAddress mk_internet_address(CInternetAddress *cia):
+     ia = InternetAddress()
+     ia._c_internet_address = cia
+     return ia
 
 ##############################################################################
 ## INTERNET ADDRESS MAILBOX (STANDARD ADDRESS)
@@ -826,16 +829,18 @@ cdef class InternetAddressList(object):
                                               ia._c_internet_address)
 
     def get_address(self, int idx):
-        cdef InternetAddress ia = InternetAddress()
         cdef CInternetAddress *cia = internet_address_list_get_address (
             self._c_internet_address_list,
             idx)
-        ia._from_c_internet_address(cia)
-        return ia
+        return mk_internet_address(cia)
 
     def to_string(self, bint encode=True):
         return internet_address_list_to_string(
             self._c_internet_address_list, encode)
+
+    def append(self, InternetAddressList other):
+        internet_address_list_append(self._c_internet_address_list,
+                                     other._c_internet_address_list)
 
 
 cdef InternetAddressList mk_internet_address_list(CInternetAddressList *cial):
