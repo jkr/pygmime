@@ -53,7 +53,7 @@ class Address(object):
     @classmethod
     def _from_gmime_address(cls, gmaddress):
         a = cls()
-        a.gmaddress = gmaddress
+        a._gmaddress = gmaddress
         a.display_name = gmaddress.get_name()
         return a
 
@@ -90,6 +90,9 @@ class AddressList(object):
         new_list = AddressList()
         new_list._gm_address_list = copy.deepcopy(self._gm_address_list)
         new_list.extend(other)
+
+    def append(self, addr):
+        self._gm_address_list.add(addr._gmaddress.to_internet_address())
 
     @classmethod
     def from_string(cls, address_list):
