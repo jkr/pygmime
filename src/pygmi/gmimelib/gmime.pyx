@@ -758,7 +758,7 @@ cdef class InternetAddress(object):
         return mk_internet_address_group(iag)
 
     def to_internet_address(self):
-        return mk_internet_address(self._c_internet_address)
+        return <InternetAddress>self
 
 cdef InternetAddress mk_internet_address(CInternetAddress *cia):
      ia = InternetAddress()
