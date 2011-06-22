@@ -763,7 +763,7 @@ cdef class InternetAddressMailbox(InternetAddress):
     def __cinit__(self):
         InternetAddress.__init__(self)
 
-    def get_address(self):
+    def get_addr(self):
         return internet_address_mailbox_get_addr(self._c_internet_address_mailbox)
 
 cdef InternetAddressMailbox mk_internet_address_mailbox(CInternetAddressMailbox *iam):

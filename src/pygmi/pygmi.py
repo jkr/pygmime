@@ -28,36 +28,47 @@ class Address(object):
 
     def __init__(self):
         self._gmaddress = None
-        self.display_name = None
+        self.address = None
+
+    @property
+    def name(self):
+        if self.is_mailbox():
+            return self._gmaddress.to_internet_address_mailbox().get_addr()
+        else:
+            gm_ial = self._gmaddress.to_internet_address_group().get_members()
+            out = AddressList()
+            out._gm_address_list = gm_ial
+            return out
 
     def __str__(self):
         return self.gmaddress.to_string()
 
-    @staticmethod
-    def _from_gmime_address(gmaddress):
-        a = Address()
+    def is_mailbox(self):
+        return self._gmaddress.is_internet_address_mailbox()
+
+    def is_group(self):
+        return self._gmaddress.is_internet_address_group()
+
+    @classmethod
+    def _from_gmime_address(cls, gmaddress):
+        a = cls()
         a.gmaddress = gmaddress
         a.display_name = gmaddress.get_name()
         return a
 
-    @staticmethod
-    def from_string(address_str):
-        return AddressList(address_str)[0]
-
 class AddressList(object):
 
-    def __init__(self, address_list):
-        self.address_list = gmimelib.parse_internet_address_list(address_list)
+    __slots__ = ["_gm_address_list"]
 
     def __getitem__(self, idx):
         if idx < len(self):
-            gmaddress = self.address_list.get_address(idx)
+            gmaddress = self._gm_address_list.get_address(idx)
             return Address._from_gmime_address(gmaddress)
         else:
             raise AddressListIndexError, idx
 
     def __len__(self):
-        return self.address_list.length()
+        return self._gm_address_list.length()
 
     def __iter__(self):
         def address_generator(add_lst):
@@ -66,7 +77,13 @@ class AddressList(object):
         return address_generator(self)
 
     def __str__(self):
-        return self.address_list.to_string()
+        return self._gm_address_list.to_string()
+
+    @classmethod
+    def from_string(cls, address_list):
+        c = cls()
+        c._gm_address_list = gmimelib.parse_internet_address_list(address_list)
+        return c
 
 class References(object):
     
