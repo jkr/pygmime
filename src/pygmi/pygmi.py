@@ -1,4 +1,5 @@
 import gmimelib
+import copy
 try:
     import GnuPGInterface
     GPG_ENABLED = True
@@ -78,6 +79,14 @@ class AddressList(object):
 
     def __str__(self):
         return self._gm_address_list.to_string()
+
+    def extend(self, other):
+        self._gm_address_list.append(other._gm_address_list)
+
+    def __add__(self, other):
+        new_list = AddressList()
+        new_list._gm_address_list = copy.deepcopy(self._gm_address_list)
+        new_list.extend(other)
 
     @classmethod
     def from_string(cls, address_list):
