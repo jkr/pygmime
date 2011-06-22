@@ -864,7 +864,7 @@ cdef class InternetAddressList(object):
         if not out_bool:
             raise Exception, "Couldn't remove item %s" % addr
 
-    def remove_at(self, InternetAddress addr, int idx):
+    def remove_at(self, int idx):
         out_bool = internet_address_list_remove_at (self._c_internet_address_list,
                                                     idx)
         if not out_bool:
