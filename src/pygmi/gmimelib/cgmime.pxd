@@ -415,7 +415,13 @@ cdef extern from "gmime/gmime.h":
     bint    GMIME_IS_GPG_CONTEXT (GMimeCipherContext*)
     GMimeGpgContext *GMIME_GPG_CONTEXT (GMimeCipherContext*)
     GMimeSession *GMIME_SESSION (GObject*)
-    GMimeSessionSimple *GMIME_SESSION_SIMPLE (GMimeSession*)
     bint GMIME_IS_SESSION_SIMPLE (GMimeSession*)
+    GMimeSessionSimple *GMIME_SESSION_SIMPLE (GMimeSession*)
+    CInternetAddress *INTERNET_ADDRESS (void*)
+    bint INTERNET_ADDRESS_IS_MAILBOX (CInternetAddress*)
+    CInternetAddressMailbox *INTERNET_ADDRESS_MAILBOX (CInternetAddress*)
+    bint INTERNET_ADDRESS_IS_GROUP (CInternetAddress*)
+    CInternetAddressGroup *INTERNET_ADDRESS_GROUP (CInternetAddress*)
+
 
     

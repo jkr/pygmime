@@ -742,6 +742,37 @@ cdef class InternetAddress(object):
     def to_string(self, bint encode=True):
         return internet_address_to_string(self._c_internet_address, encode)
 
+    def is_internet_address_mailbox(self):
+        return INTERNET_ADDRESS_IS_MAILBOX(self._c_internet_address)
+
+    def to_internet_address_mailbox(self):
+        if not self.is_internet_address_mailbox():
+            raise Exception, "Can't convert to message"
+        cdef CInternetAddressMailbox *iab = INTERNET_ADDRESS_MAILBOX(self._c_internet_address)
+        return mk_internet_address_mailbox(iab)
+        
+
+##############################################################################
+## INTERNET ADDRESS MAILBOX (STANDARD ADDRESS)
+##############################################################################
+
+cdef class InternetAddressMailbox(InternetAddress):
+
+    cdef CInternetAddressMailbox *_c_internet_address_mailbox
+
+    def __cinit__(self):
+        InternetAddress.__init__(self)
+
+    def get_address(self):
+        return internet_address_mailbox_get_addr(self._c_internet_address_mailbox)
+
+cdef InternetAddressMailbox mk_internet_address_mailbox(CInternetAddressMailbox *iam):
+    mailbox = InternetAddressMailbox()
+    mailbox._c_internet_address_mailbox = iam
+    mailbox._c_internet_address = INTERNET_ADDRESS(iam)
+    return mailbox
+
+
 ##############################################################################
 ## INTERNET ADDRESS LIST
 ##############################################################################
