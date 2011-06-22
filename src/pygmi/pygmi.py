@@ -29,10 +29,10 @@ class Address(object):
 
     def __init__(self):
         self._gmaddress = None
-        self.address = None
+        self.name = ""
 
     @property
-    def name(self):
+    def address(self):
         if self.is_mailbox():
             return self._gmaddress.to_internet_address_mailbox().get_addr()
         else:
