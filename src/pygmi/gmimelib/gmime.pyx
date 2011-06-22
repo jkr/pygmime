@@ -842,6 +842,15 @@ cdef class InternetAddressList(object):
         internet_address_list_append(self._c_internet_address_list,
                                      other._c_internet_address_list)
 
+    def add(self, InternetAddress addr):
+        idx = internet_address_list_add (self._c_internet_address_list,
+                                         addr._c_internet_address)
+        return idx
+
+    def insert(self, InternetAddress addr, int idx):
+        internet_address_list_insert (self._c_internet_address_list,
+                                      idx,
+                                      addr._c_internet_address)
 
 cdef InternetAddressList mk_internet_address_list(CInternetAddressList *cial):
     cdef InternetAddressList ial = InternetAddressList()
