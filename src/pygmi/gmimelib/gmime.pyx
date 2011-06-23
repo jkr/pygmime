@@ -813,6 +813,9 @@ cdef InternetAddressGroup mk_internet_address_group(CInternetAddressGroup *iag):
 ## INTERNET ADDRESS LIST
 ##############################################################################
 
+class InternetAddressListError(Exception):
+    pass
+
 cdef class InternetAddressList(object):
 
     cdef CInternetAddressList *_c_internet_address_list
@@ -862,13 +865,13 @@ cdef class InternetAddressList(object):
         out_bool = internet_address_list_remove (self._c_internet_address_list,
                                                  addr._c_internet_address)
         if not out_bool:
-            raise Exception, "Couldn't remove item %s" % addr
+            raise InternetAddressListError, "Couldn't remove item %s" % addr
 
     def remove_at(self, int idx):
         out_bool = internet_address_list_remove_at (self._c_internet_address_list,
                                                     idx)
         if not out_bool:
-            raise Exception, "Couldn't remove item at index %d" % idx
+            raise InternetAddressListError, "Couldn't remove item at index %d" % idx
 
 
 
