@@ -13,6 +13,9 @@ class PygmiError(Exception):
 class ParserError(Exception):
     pass
 
+class AddressError(Exception):
+    pass
+
 class AddressListError(Exception):
     pass
 
@@ -27,14 +30,7 @@ class MultipartError(Exception):
 
 class Address(object):
 
-    __slots__ = ["name", "address", "_gmaddress"]
-
-    def __init__(self, name, addr):
-        if isinstance(addr, str):
-            self._gmaddress = gmimelib.InternetAddressMailbox(name, addr)
-        elif isinstance(addr, AddressList):
-            self._gmaddress = gmimelib.InternetAddressGroup(name)
-            self._gmaddress.set_members(addr)
+    __slots__ = ["_gmaddress"]
 
     @property
     def name(self):
@@ -47,15 +43,19 @@ class Address(object):
     @property
     def address(self):
         if self.is_mailbox():
-            return self._gmaddress.get_addr()
+            return self._gmaddress.to_internet_address_mailbox().get_addr()
         else:
-            gm_ial = self._gmaddress.get_members()
+            gm_ial = self._gmaddress.to_internet_address_group().get_members()
             out = AddressList()
             out._gm_address_list = gm_ial
             return out
 
+    @address.setter
+    def address(self, addr):
+        self = self.__init__(self.name, addr)
+
     def __str__(self):
-        return self.gmaddress.to_string()
+        return self._gmaddress.to_string()
 
     def is_mailbox(self):
         return self._gmaddress.is_internet_address_mailbox()
@@ -64,17 +64,23 @@ class Address(object):
         return self._gmaddress.is_internet_address_group()
 
     @classmethod
-    def _from_gmime_address(cls, gmaddress):
-        a = cls(None, None)
-        a._gmaddress = gmaddress
-        a.name = gmaddress.get_name()
-        if gmaddress.is_mailbox():
-            a.address = gmaddress.to_internet_address_mailbox().get_addr()
+    def from_name_and_address(cls, name, addr):
+        obj = cls()
+        if isinstance(addr, str):
+            obj._gmaddress = gmimelib.InternetAddressMailbox(name, addr)
+        elif isinstance(addr, AddressList):
+            obj._gmaddress = gmimelib.InternetAddressGroup(name)
+            obj._gmaddress.set_members(addr)
         else:
-            gm_ial = gmaddress.to_internet_address_group().get_members()
-            a.address = AddressList()
-            a.address._gm_address_list = gm_ial
-        return a
+            raise AddressError, "Illegal initialization"
+        return obj
+
+    @classmethod
+    def _from_gmime_address(cls, gmaddress):
+        obj = cls()
+        obj._gmaddress = gmaddress
+        return obj
+
 
 class AddressList(object):
 
