@@ -13,7 +13,7 @@ class PygmiError(Exception):
 class ParserError(Exception):
     pass
 
-class AddressListIndexError(Exception):
+class AddressListError(Exception):
     pass
 
 class HeaderNameError(Exception):
@@ -69,7 +69,7 @@ class AddressList(object):
             gmaddress = self._gm_address_list.get_address(idx)
             return Address._from_gmime_address(gmaddress)
         else:
-            raise AddressListIndexError, idx
+            raise AddressListError, idx
 
     def __len__(self):
         return self._gm_address_list.length()
@@ -106,14 +106,14 @@ class AddressList(object):
     def remove(self, addr):
         try:
             self._gm_address_list.remove(addr._gmaddress)
-        except:
-            raise AddressListIndexError, "Couldn't remove %s" % addr
+        except gmimelib.InternetAddressListError as err:
+            raise AddressListError, err
 
     def remove_at(self, idx):
         try:
             self._gm_address_list.remove_at(idx)
-        except:
-            raise AddressListIndexError, "Couldn't remove at index %d" % index
+        except gmimelib.InternetAddressListError as err:
+            raise AddressListError, err
 
 
 class References(object):
