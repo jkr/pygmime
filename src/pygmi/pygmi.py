@@ -27,16 +27,29 @@ class MultipartError(Exception):
 
 class Address(object):
 
-    def __init__(self):
-        self._gmaddress = None
-        self.name = ""
+    __slots__ = ["name", "address", "_gmaddress"]
+
+    def __init__(self, name, addr):
+        if isinstance(addr, str):
+            self._gmaddress = gmimelib.InternetAddressMailbox(name, addr)
+        elif isinstance(addr, AddressList):
+            self._gmaddress = gmimelib.InternetAddressGroup(name)
+            self._gmaddress.set_members(addr)
+
+    @property
+    def name(self):
+        return self._gmaddress.get_name()
+
+    @name.setter
+    def name(self, string):
+        self._gmaddress.set_name(string)
 
     @property
     def address(self):
         if self.is_mailbox():
-            return self._gmaddress.to_internet_address_mailbox().get_addr()
+            return self._gmaddress.get_addr()
         else:
-            gm_ial = self._gmaddress.to_internet_address_group().get_members()
+            gm_ial = self._gmaddress.get_members()
             out = AddressList()
             out._gm_address_list = gm_ial
             return out
@@ -52,17 +65,26 @@ class Address(object):
 
     @classmethod
     def _from_gmime_address(cls, gmaddress):
-        a = cls()
+        a = cls(None, None)
         a._gmaddress = gmaddress
-        a.display_name = gmaddress.get_name()
+        a.name = gmaddress.get_name()
+        if gmaddress.is_mailbox():
+            a.address = gmaddress.to_internet_address_mailbox().get_addr()
+        else:
+            gm_ial = gmaddress.to_internet_address_group().get_members()
+            a.address = AddressList()
+            a.address._gm_address_list = gm_ial
         return a
 
 class AddressList(object):
 
     __slots__ = ["_gm_address_list"]
 
-    def __init__(self):
+    def __init__(self, addresses = None):
         self._gm_address_list = gmimelib.InternetAddressList()
+        if addresses:
+            for a in addresses:
+                self.append(a)
 
     def __getitem__(self, idx):
         if idx < len(self):
