@@ -866,7 +866,7 @@ cdef class InternetAddressMailbox(InternetAddress):
         
 
 cdef InternetAddressMailbox mk_internet_address_mailbox(CInternetAddressMailbox *iam):
-    mailbox = InternetAddressMailbox()
+    mailbox = InternetAddressMailbox(None, None)
     mailbox._c_internet_address_mailbox = iam
     mailbox._c_internet_address = INTERNET_ADDRESS(iam)
     return mailbox
@@ -898,7 +898,7 @@ cdef class InternetAddressGroup(InternetAddress):
         return idx
 
 cdef InternetAddressGroup mk_internet_address_group(CInternetAddressGroup *iag):
-    group = InternetAddressGroup()
+    group = InternetAddressGroup(None)
     group._c_internet_address_group = iag
     group._c_internet_address = INTERNET_ADDRESS(iag)
     return group
