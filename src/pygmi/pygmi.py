@@ -103,6 +103,19 @@ class AddressList(object):
         c._gm_address_list = gmimelib.parse_internet_address_list(address_list)
         return c
 
+    def remove(self, addr):
+        try:
+            self._gm_address_list.remove(addr._gmaddress)
+        except:
+            raise AddressListIndexError, "Couldn't remove %s" % addr
+
+    def remove_at(self, idx):
+        try:
+            self._gm_address_list.remove_at(idx)
+        except:
+            raise AddressListIndexError, "Couldn't remove at index %d" % index
+
+
 class References(object):
     
     def __init__(self, references_str):
