@@ -736,6 +736,9 @@ cdef class InternetAddress(object):
         else:
             return out
 
+    def set_name(self, char *name):
+        internet_address_set_name(self._c_internet_address, name)
+
     def to_string(self, bint encode=True):
         return internet_address_to_string(self._c_internet_address, encode)
 
@@ -766,50 +769,6 @@ cdef InternetAddress mk_internet_address(CInternetAddress *cia):
      return ia
 
 ##############################################################################
-## INTERNET ADDRESS MAILBOX (STANDARD ADDRESS)
-##############################################################################
-
-cdef class InternetAddressMailbox(InternetAddress):
-
-    cdef CInternetAddressMailbox *_c_internet_address_mailbox
-
-    def __cinit__(self):
-        InternetAddress.__init__(self)
-
-    def get_addr(self):
-        return internet_address_mailbox_get_addr(self._c_internet_address_mailbox)
-
-cdef InternetAddressMailbox mk_internet_address_mailbox(CInternetAddressMailbox *iam):
-    mailbox = InternetAddressMailbox()
-    mailbox._c_internet_address_mailbox = iam
-    mailbox._c_internet_address = INTERNET_ADDRESS(iam)
-    return mailbox
-
-##############################################################################
-## INTERNET ADDRESS GROUP 
-##############################################################################
-
-cdef class InternetAddressGroup(InternetAddress):
-
-    cdef CInternetAddressGroup *_c_internet_address_group
-
-    def __cinit__(self):
-        InternetAddress.__init__(self)
-
-    def get_members(self):
-        cdef CInternetAddressList *cial 
-        cial = internet_address_group_get_members(self._c_internet_address_group)
-        return mk_internet_address_list(cial)
-
-cdef InternetAddressGroup mk_internet_address_group(CInternetAddressGroup *iag):
-    group = InternetAddressGroup()
-    group._c_internet_address_group = iag
-    group._c_internet_address = INTERNET_ADDRESS(iag)
-    return group
-
-
-
-##############################################################################
 ## INTERNET ADDRESS LIST
 ##############################################################################
 
@@ -820,7 +779,7 @@ cdef class InternetAddressList(object):
 
     cdef CInternetAddressList *_c_internet_address_list
 
-    def __init__(self):
+    def __cinit__(self):
         self._c_internet_address_list = internet_address_list_new()
     
     def length(self):
@@ -874,8 +833,6 @@ cdef class InternetAddressList(object):
             raise InternetAddressListError, "Couldn't remove item at index %d" % idx
 
 
-
-
 cdef InternetAddressList mk_internet_address_list(CInternetAddressList *cial):
     cdef InternetAddressList ial = InternetAddressList()
     ial._c_internet_address_list = cial
@@ -888,6 +845,65 @@ def parse_internet_address_list(char *s):
     InternetAddressList() object."""
     cdef CInternetAddressList *cial = internet_address_list_parse_string (s)
     return mk_internet_address_list(cial)
+
+##############################################################################
+## INTERNET ADDRESS MAILBOX (STANDARD ADDRESS)
+##############################################################################
+
+cdef class InternetAddressMailbox(InternetAddress):
+
+    cdef CInternetAddressMailbox *_c_internet_address_mailbox
+
+    def __cinit__(self, char *name, char *addr):
+        self._c_internet_address = internet_address_mailbox_new(name, addr)
+        self._c_internet_address_mailbox = INTERNET_ADDRESS_MAILBOX (self._c_internet_address)
+
+    def get_addr(self):
+        return internet_address_mailbox_get_addr(self._c_internet_address_mailbox)
+
+    def set_addr(self, char *addr):
+        internet_address_mailbox_set_addr(self._c_internet_address_mailbox, addr)
+        
+
+cdef InternetAddressMailbox mk_internet_address_mailbox(CInternetAddressMailbox *iam):
+    mailbox = InternetAddressMailbox()
+    mailbox._c_internet_address_mailbox = iam
+    mailbox._c_internet_address = INTERNET_ADDRESS(iam)
+    return mailbox
+
+##############################################################################
+## INTERNET ADDRESS GROUP 
+##############################################################################
+
+cdef class InternetAddressGroup(InternetAddress):
+
+    cdef CInternetAddressGroup *_c_internet_address_group
+
+    def __cinit__(self, char *name):
+        self._c_internet_address = internet_address_group_new(name)
+        self._c_internet_address_group = INTERNET_ADDRESS_GROUP (self._c_internet_address)
+
+    def get_members(self):
+        cdef CInternetAddressList *cial 
+        cial = internet_address_group_get_members(self._c_internet_address_group)
+        return mk_internet_address_list(cial)
+
+    def set_members(self, InternetAddressList members):
+        internet_address_group_set_members (self._c_internet_address_group,
+                                            members._c_internet_address_list)
+
+    def add_member(self, InternetAddress member):
+        idx = internet_address_group_add_member (self._c_internet_address_group,
+                                                  member._c_internet_address)
+        return idx
+
+cdef InternetAddressGroup mk_internet_address_group(CInternetAddressGroup *iag):
+    group = InternetAddressGroup()
+    group._c_internet_address_group = iag
+    group._c_internet_address = INTERNET_ADDRESS(iag)
+    return group
+
+
 
         
 

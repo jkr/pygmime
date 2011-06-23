@@ -286,6 +286,7 @@ cdef extern from "gmime/gmime.h":
     bint          g_mime_header_list_get_iter         (GMimeHeaderList *headers, GMimeHeaderIter *iter)
 
     char *        internet_address_get_name           (CInternetAddress *ia)
+    void          internet_address_set_name           (CInternetAddress *ia, char* name)
     char *        internet_address_to_string          (CInternetAddress *ia, bint encode)
 
     CInternetAddress *   internet_address_group_new          (char *name)
