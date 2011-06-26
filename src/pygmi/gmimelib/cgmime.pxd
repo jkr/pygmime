@@ -241,6 +241,7 @@ cdef extern from "gmime/gmime.h":
     int         *g_mime_stream_reset (GMimeStream *stream)
     signed long long g_mime_stream_tell (GMimeStream *stream)
     GMimeStream *g_mime_stream_file_new (FILE*)
+    GMimeStream *g_mime_stream_fs_new (int fd)
     GMimeStream *g_mime_stream_mem_new ()
     GMimeStream *g_mime_stream_mem_new_with_byte_array (GByteArray *array)
     GByteArray *g_mime_stream_mem_get_byte_array (GMimeStream *stream)

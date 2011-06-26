@@ -1,5 +1,6 @@
 import gmimelib
 import copy
+import os
 try:
     import GnuPGInterface
     GPG_ENABLED = True
@@ -213,6 +214,10 @@ class Parser(object):
     def read_file(self, filename):
         self.stream = gmimelib.Stream()
         self.stream.from_file(filename)
+
+    def read_fd(self, fd):
+        self.stream = gmimelib.Stream()
+        self.stream.from_fd(fd)
 
     def read_string(self, bts):
         self.stream = gmimelib.Stream()

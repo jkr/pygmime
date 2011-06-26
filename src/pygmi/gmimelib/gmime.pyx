@@ -67,7 +67,13 @@ cdef class Stream (object):
 
     def from_file(self, char* filename):
         cdef FILE* fp = fopen(filename, "rb")
+        if fp == NULL:
+            raise Exception, "File %s not found" % filename
         cdef GMimeStream *gms = g_mime_stream_file_new(fp)
+        self._from_gmime_stream(gms)
+
+    def from_fd(self, int fd):
+        cdef GMimeStream *gms = g_mime_stream_fs_new(fd)
         self._from_gmime_stream(gms)
 
     def from_stdin(self):
