@@ -213,7 +213,10 @@ class Parser(object):
 
     def read_file(self, filename):
         self.stream = gmimelib.Stream()
-        self.stream.from_file(filename)
+        try:
+            self.stream.from_file(filename)
+        except gmimelib.Error as err:
+            raise ParserError, err
 
     def read_fd(self, fd):
         self.stream = gmimelib.Stream()
